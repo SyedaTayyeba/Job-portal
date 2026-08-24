@@ -158,13 +158,12 @@ const JobSeekerDashboard = () => {
                 Search for Jobs
               </button>
 
-              <button
-                type="button"
-                className="w-full text-left px-4 py-3 rounded-lg bg-slate-50 hover:bg-blue-50 text-sm font-medium text-slate-700 hover:text-blue-600 transition"
-              >
-                View Applications
-              </button>
-
+             <Link
+  to="/my-applications"
+  className="block w-full text-left px-4 py-3 rounded-lg bg-slate-50 hover:bg-blue-50 text-sm font-medium text-slate-700 hover:text-blue-600 transition"
+>
+  View Applications
+</Link>
               <button
                 type="button"
                 className="w-full text-left px-4 py-3 rounded-lg bg-slate-50 hover:bg-blue-50 text-sm font-medium text-slate-700 hover:text-blue-600 transition"

@@ -9,144 +9,168 @@ use Illuminate\Http\Request;
 
 class ApplicationController extends Controller
 {
+    // =========================================================
+    // JOB SEEKER → JOB PAR APPLY KARNA
+    // =========================================================
     public function store(Request $request)
     {
+        // Logged-in user nikal rahe hain
         $user = auth()->user();
 
+        // Agar user login nahi hai
         if (! $user) {
             return response()->json([
                 'message' => 'User not authenticated.',
             ], 401);
         }
 
-        if ($user->role !== 'employer') {
-            return response()->json([
-                'message' => 'Only employers can create jobs.',
-            ], 403);
-        }
-        // Get the currently authenticated user
-        $user = auth()->user();
-
-        // Check if the user is authenticated
-        if (! $user) {
-            return response()->json([
-                'message' => 'User not authenticated.',
-            ], 401);
-        }
-
-        // Only job seekers are allowed to apply for jobs
+        // Sirf job seeker apply kar sakta hai
         if ($user->role !== 'job_seeker') {
             return response()->json([
                 'message' => 'Only job seekers can apply for jobs.',
             ], 403);
         }
 
-        // Validate the job ID and make sure the job exists
-        $request->validate([
+        // Frontend se job_id lazmi hai
+        $validated = $request->validate([
             'job_id' => 'required|exists:job_posts,id',
         ]);
 
-        // Check if this user has already applied for this job
-        $existingApplication = Application::where('user_id', auth()->id())
-            ->where('job_id', $request->job_id)
+        // Check karte hain ke user ne pehle se apply to nahi kiya
+        $existingApplication = Application::where('user_id', $user->id)
+            ->where('job_id', $validated['job_id'])
             ->first();
 
-        // Prevent duplicate applications
+        // Duplicate application allow nahi hogi
         if ($existingApplication) {
             return response()->json([
                 'message' => 'You have already applied for this job.',
             ], 409);
         }
 
-        // Find the selected job
-        $job = Job::find($request->job_id);
+        // Job find kar rahe hain
+        $job = Job::find($validated['job_id']);
 
-        // Check if the job exists
+        // Safety check
         if (! $job) {
             return response()->json([
                 'message' => 'Job not found.',
             ], 404);
         }
 
-        // Only allow applications for active jobs
+        // Sirf active jobs par apply ho sakta hai
         if ($job->status !== 'active') {
             return response()->json([
                 'message' => 'You cannot apply for a job that is not active.',
             ], 400);
         }
 
-        // Create a new application
+        // New application create kar rahe hain
         $application = new Application;
 
-        // Store the ID of the logged-in user
-        $application->user_id = auth()->id();
+        // Current logged-in job seeker ki ID
+        $application->user_id = $user->id;
 
-        // Store the ID of the job being applied for
-        $application->job_id = $request->job_id;
+        // Jis job par apply kiya ja raha hai uski ID
+        $application->job_id = $job->id;
 
-        // Save the application in the database
+        // Application save
         $application->save();
 
-        // Return a successful response
+        // Success response
         return response()->json([
             'message' => 'Application submitted successfully.',
+            'application' => $application,
         ], 201);
     }
 
-    // user can see the submitted applications
+
+    // =========================================================
+    // JOB SEEKER → APNI APPLICATIONS DEKHNA
+    // =========================================================
     public function index()
     {
-        $applications = Application::with('job')->where('user_id', auth()->id())->get();
-
-        return response()->json($applications);
-    }
-
-    // company can see the applications submitted for their jobs
-    public function companyApplications($companyId)
-    {
-        $company = Company::find($companyId);
-
-        if (! $company) {
-            return response()->json([
-                'message' => 'Company not found',
-            ], 404);
-        }
-
-        if ($company->user_id !== auth()->id()) {
-            return response()->json([
-                'message' => 'Unauthorized',
-            ], 403);
-        }
-
-        $applications = Application::with('job')
-            ->whereHas('job', function ($query) use ($companyId) {
-                $query->where('company_id', $companyId);
-            })
+        // Logged-in user ki applications hi show hongi
+        $applications = Application::with('job.company')
+            ->where('user_id', auth()->id())
+            ->latest()
             ->get();
 
         return response()->json($applications);
     }
 
+
+    // =========================================================
+    // EMPLOYER → APNI COMPANY KI APPLICATIONS DEKHNA
+    // =========================================================
+    public function companyApplications($companyId)
+    {
+        // Company find kar rahe hain
+        $company = Company::find($companyId);
+
+        // Company nahi mili
+        if (! $company) {
+            return response()->json([
+                'message' => 'Company not found.',
+            ], 404);
+        }
+
+        // Check kar rahe hain company isi employer ki hai
+        if ($company->user_id !== auth()->id()) {
+            return response()->json([
+                'message' => 'Unauthorized.',
+            ], 403);
+        }
+
+        // Is company ki jobs par aane wali applications
+        $applications = Application::with('job')
+            ->whereHas('job', function ($query) use ($companyId) {
+                $query->where('company_id', $companyId);
+            })
+            ->latest()
+            ->get();
+
+        return response()->json($applications);
+    }
+
+
+    // =========================================================
+    // EMPLOYER → APPLICATION ACCEPT / REJECT KARNA
+    // =========================================================
     public function updateStatus(Request $request, $applicationId)
     {
-        $request->validate([
+        // Sirf accepted ya rejected status allowed hai
+        $validated = $request->validate([
             'status' => 'required|in:accepted,rejected',
         ]);
 
-        $application = Application::find($applicationId);
+        // Application find kar rahe hain
+        $application = Application::with('job.company')
+            ->find($applicationId);
 
+        // Application nahi mili
         if (! $application) {
-            return response()->json(['message' => 'Application not found.'], 404);
+            return response()->json([
+                'message' => 'Application not found.',
+            ], 404);
         }
 
-        // Check if the authenticated user is the owner of the company that posted the job
+        // Check karte hain job ki company isi employer ki hai
         if ($application->job->company->user_id !== auth()->id()) {
-            return response()->json(['message' => 'Unauthorized.'], 403);
+            return response()->json([
+                'message' => 'Unauthorized.',
+            ], 403);
         }
 
-        $application->status = $request->status;
+        // Status update
+        $application->status = $validated['status'];
+
+        // Database mein save
         $application->save();
 
-        return response()->json(['message' => 'Application status updated successfully.']);
+        return response()->json([
+            'message' => 'Application status updated successfully.',
+            'application' => $application,
+        ]);
     }
 }

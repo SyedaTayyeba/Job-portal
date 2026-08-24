@@ -8,55 +8,60 @@ use Illuminate\Http\Request;
 
 class JobController extends Controller
 {
-   public function store(Request $request)
+
+public function store(Request $request)
 {
     // Logged-in employer ko get kar rahe hain
     $user = auth()->user();
 
-    // Check kar rahe hain user login hai ya nahi
+    // Agar user login nahi hai to error
     if (!$user) {
         return response()->json([
-            'message' => 'User not authenticated.'
+            'message' => 'User not authenticated.',
         ], 401);
     }
 
     // Sirf employer job create kar sakta hai
     if ($user->role !== 'employer') {
         return response()->json([
-            'message' => 'Only employers can create jobs.'
+            'message' => 'Only employers can create jobs.',
         ], 403);
     }
 
-    // Logged-in employer ki company find kar rahe hain
-    $company = Company::where('user_id', $user->id)->first();
-
-    // Agar employer ki company nahi bani hui
-    if (!$company) {
-        return response()->json([
-            'message' => 'Please create your company profile first.'
-        ], 400);
-    }
-
-    // Job data validate kar rahe hain
+    // Job form ki values validate kar rahe hain
     $validated = $request->validate([
-        'title' => 'required|string|max:255',
+        'title' => 'required|string',
         'description' => 'required|string',
         'salary' => 'required|numeric',
-        'location' => 'nullable|string|max:255',
+        'location' => 'required|string',
         'status' => 'required|in:active,closed',
     ]);
 
-    // Job create kar rahe hain
-    $job = Job::create([
-        // Company ID automatically logged-in employer ki company se aaegi
-        'company_id' => $company->id,
+    // Logged-in employer ki company automatically find hogi
+    // Isliye frontend se company_id lene ki zaroorat nahi
+    $company = $user->company;
 
-        'title' => $validated['title'],
-        'description' => $validated['description'],
-        'salary' => $validated['salary'],
-        'location' => $validated['location'],
-        'status' => $validated['status'],
-    ]);
+    // Agar employer ne abhi company create nahi ki
+    if (!$company) {
+        return response()->json([
+            'message' => 'Please create your company profile first.',
+        ], 422);
+    }
+
+    // New job create kar rahe hain
+    $job = new Job;
+
+    // Company ID automatically logged-in employer ki company se aa rahi hai
+    $job->company_id = $company->id;
+
+    $job->title = $validated['title'];
+    $job->description = $validated['description'];
+    $job->salary = $validated['salary'];
+    $job->location = $validated['location'];
+    $job->status = $validated['status'];
+
+    // Database mein job save
+    $job->save();
 
     // Success response
     return response()->json([
@@ -64,6 +69,7 @@ class JobController extends Controller
         'job' => $job,
     ], 201);
 }
+
 
     public function index()
     {

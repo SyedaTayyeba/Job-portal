@@ -1,66 +1,134 @@
-import React, { useEffect, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import  { useEffect, useState } from "react";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 
 const JobDetails = () => {
-  // URL se job ki ID milegi
-  // Example: /jobs/1 -> id = 1
+  // URL se job ID le rahe hain
+  // Example: /jobs/1 → id = 1
   const { id } = useParams();
 
-  // Backend se aane wali job ko yahan store karenge
+  // Page change karne ke liye
+  const navigate = useNavigate();
+
+  // Job ka data yahan store hoga
   const [job, setJob] = useState(null);
 
-  // Loading ke liye state
+  // Loading ke liye
   const [loading, setLoading] = useState(true);
 
-  // Error message ke liye state
+  // Error message ke liye
   const [error, setError] = useState("");
 
-  // Page load hote hi backend se job details fetch hongi
+  // Apply button ke waqt loading
+  const [applying, setApplying] = useState(false);
+
+  // ==============================
+  // JOB BACKEND SE GET KARNA
+  // ==============================
+
   useEffect(() => {
     axios
       .get(`http://localhost:8000/api/jobs/${id}`)
       .then((response) => {
-        console.log("Job details:", response.data);
-
-        // Backend se job state mein save
+        // Backend se job receive hui
         setJob(response.data);
 
+        // Loading khatam
         setLoading(false);
       })
       .catch((error) => {
-        console.error("Error fetching job:", error);
+        console.log("Error fetching job:", error);
 
-        setError("Unable to load job details.");
+        setError("Job not found.");
         setLoading(false);
       });
   }, [id]);
 
-  // Apply button filhal UI hai
-  // Apply API hum next step mein connect karenge
-  const handleApply = () => {
-    alert("Apply feature will be connected next.");
+  // ==============================
+  // APPLY JOB
+  // ==============================
+
+  const handleApply = async () => {
+    // LocalStorage se login token lena
+    const token = localStorage.getItem("token");
+
+    // Agar token nahi hai to login page par bhej do
+    if (!token) {
+      alert("Please login first.");
+      navigate("/login");
+      return;
+    }
+
+    try {
+      // Apply button loading
+      setApplying(true);
+
+      // Backend ko application send kar rahe hain
+      const response = await axios.post(
+        "http://localhost:8000/api/apply",
+        {
+          job_id: job.id,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            Accept: "application/json",
+          },
+        }
+      );
+
+      // Success message
+      alert(
+        response.data.message || "Application submitted successfully!"
+      );
+    } catch (error) {
+      console.log("Apply Error:", error);
+
+      // Backend ka error message show karna
+      const message =
+        error.response?.data?.message ||
+        "Unable to apply for this job.";
+
+      alert(message);
+    } finally {
+      // Button normal
+      setApplying(false);
+    }
   };
 
-  // Jab backend response aa raha ho
+  // ==============================
+  // LOADING SCREEN
+  // ==============================
+
   if (loading) {
     return (
       <main className="min-h-screen bg-slate-100 flex items-center justify-center">
-        <p className="text-slate-600">Loading job details...</p>
+        <p className="text-slate-600">
+          Loading job...
+        </p>
       </main>
     );
   }
 
-  // Agar backend se error aaye
-  if (error) {
+  // ==============================
+  // ERROR SCREEN
+  // ==============================
+
+  if (error || !job) {
     return (
-      <main className="min-h-screen bg-slate-100 flex items-center justify-center px-4">
-        <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-8 text-center">
-          <p className="text-red-600">{error}</p>
+      <main className="min-h-screen bg-slate-100">
+        <div className="max-w-3xl mx-auto px-4 py-12 text-center">
+          <h1 className="text-2xl font-bold text-slate-900">
+            Job Not Found
+          </h1>
+
+          <p className="mt-2 text-slate-500">
+            This job does not exist or has been removed.
+          </p>
 
           <Link
             to="/jobs"
-            className="inline-block mt-4 text-sm font-semibold text-blue-600 hover:underline"
+            className="inline-block mt-6 px-5 py-3 rounded-lg bg-blue-600 text-white font-semibold"
           >
             Back to Jobs
           </Link>
@@ -69,23 +137,14 @@ const JobDetails = () => {
     );
   }
 
-  // Agar job nahi mili
-  if (!job) {
-    return (
-      <main className="min-h-screen bg-slate-100 flex items-center justify-center">
-        <p className="text-slate-600">Job not found.</p>
-      </main>
-    );
-  }
-
   return (
     <main className="min-h-screen bg-slate-100">
+
       {/* ================= NAVBAR ================= */}
 
       <nav className="bg-white border-b border-slate-200">
         <div className="max-w-7xl mx-auto px-4 md:px-8 py-4 flex items-center justify-between">
 
-          {/* Logo */}
           <Link
             to="/job-seeker-dashboard"
             className="text-xl font-bold text-blue-600"
@@ -93,37 +152,32 @@ const JobDetails = () => {
             JobPortal
           </Link>
 
-          {/* Navbar links */}
           <div className="flex items-center gap-4">
+
             <Link
               to="/jobs"
-              className="text-sm font-medium text-slate-700 hover:text-blue-600 transition"
+              className="text-sm font-medium text-slate-700 hover:text-blue-600"
             >
               Jobs
             </Link>
 
             <Link
               to="/job-seeker-dashboard"
-              className="text-sm font-medium text-slate-700 hover:text-blue-600 transition"
+              className="text-sm font-medium text-slate-700 hover:text-blue-600"
             >
               Dashboard
             </Link>
 
-            <Link
-              to="/profile"
-              className="text-sm font-medium text-slate-700 hover:text-blue-600 transition"
-            >
-              Profile
-            </Link>
           </div>
         </div>
       </nav>
 
       {/* ================= MAIN ================= */}
 
-      <section className="max-w-5xl mx-auto px-4 md:px-8 py-8">
+      <section className="max-w-5xl mx-auto px-4 md:px-8 py-10">
 
         {/* Back button */}
+
         <Link
           to="/jobs"
           className="text-sm font-medium text-blue-600 hover:underline"
@@ -131,89 +185,92 @@ const JobDetails = () => {
           ← Back to Jobs
         </Link>
 
-        {/* Job Header */}
+        {/* Job Card */}
+
         <div className="mt-6 bg-white rounded-2xl border border-slate-200 shadow-sm p-6 md:p-8">
 
-          <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-6">
+          {/* Job title */}
 
-            <div>
-              {/* Job title */}
-              <h1 className="text-3xl font-bold text-slate-900">
-                {job.title}
-              </h1>
+          <h1 className="text-3xl font-bold text-slate-900">
+            {job.title}
+          </h1>
 
-              {/* Company name */}
-              <p className="mt-2 text-lg font-semibold text-blue-600">
-                {job.company?.name || "Company"}
+          {/* Company */}
+
+          <p className="mt-2 text-lg font-semibold text-blue-600">
+            {job.company?.name || "Company"}
+          </p>
+
+          {/* Basic information */}
+
+          <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
+
+            <div className="bg-slate-50 rounded-xl p-4">
+              <p className="text-xs text-slate-500">
+                Location
               </p>
 
-              {/* Location */}
-              <p className="mt-4 text-sm text-slate-500">
-                📍 {job.location}
-              </p>
-
-              {/* Salary */}
-              <p className="mt-2 text-sm text-slate-500">
-                💰 PKR {job.salary}
-              </p>
-
-              {/* Status */}
-              <p className="mt-2 text-sm text-slate-500">
-                Status:{" "}
-                <span
-                  className={
-                    job.status === "active"
-                      ? "font-semibold text-green-600"
-                      : "font-semibold text-red-600"
-                  }
-                >
-                  {job.status}
-                </span>
+              <p className="mt-1 font-semibold text-slate-800">
+                📍 {job.location || "Not specified"}
               </p>
             </div>
 
-            {/* Apply button */}
+            <div className="bg-slate-50 rounded-xl p-4">
+              <p className="text-xs text-slate-500">
+                Salary
+              </p>
+
+              <p className="mt-1 font-semibold text-slate-800">
+                💰 PKR {job.salary}
+              </p>
+            </div>
+
+            <div className="bg-slate-50 rounded-xl p-4">
+              <p className="text-xs text-slate-500">
+                Status
+              </p>
+
+              <p className="mt-1 font-semibold text-green-600">
+                {job.status}
+              </p>
+            </div>
+
+          </div>
+
+          {/* Description */}
+
+          <div className="mt-8">
+
+            <h2 className="text-xl font-bold text-slate-900">
+              Job Description
+            </h2>
+
+            <p className="mt-3 text-slate-600 leading-7 whitespace-pre-line">
+              {job.description}
+            </p>
+
+          </div>
+
+          {/* Apply */}
+
+          <div className="mt-8 pt-6 border-t border-slate-200">
+
             <button
               type="button"
               onClick={handleApply}
-              disabled={job.status !== "active"}
-              className={`px-6 py-3 rounded-lg text-sm font-semibold transition ${
-                job.status === "active"
-                  ? "bg-blue-600 text-white hover:bg-blue-700 cursor-pointer"
-                  : "bg-slate-300 text-slate-500 cursor-not-allowed"
-              }`}
+              disabled={applying || job.status !== "active"}
+              className="w-full md:w-auto px-8 py-3 rounded-lg bg-blue-600 text-white font-semibold hover:bg-blue-700 transition disabled:bg-slate-400 disabled:cursor-not-allowed"
             >
-              {job.status === "active" ? "Apply Now" : "Job Closed"}
+              {applying
+                ? "Applying..."
+                : job.status === "active"
+                ? "Apply Now"
+                : "Job Closed"}
             </button>
+
           </div>
+
         </div>
-
-        {/* ================= JOB DESCRIPTION ================= */}
-
-        <div className="mt-6 bg-white rounded-2xl border border-slate-200 shadow-sm p-6 md:p-8">
-
-          <h2 className="text-xl font-bold text-slate-900">
-            Job Description
-          </h2>
-
-          <p className="mt-4 text-slate-600 leading-7 whitespace-pre-line">
-            {job.description}
-          </p>
-        </div>
-
-        {/* ================= COMPANY ================= */}
-
-        <div className="mt-6 bg-white rounded-2xl border border-slate-200 shadow-sm p-6 md:p-8">
-
-          <h2 className="text-xl font-bold text-slate-900">
-            About the Company
-          </h2>
-
-          <p className="mt-4 text-slate-600">
-            {job.company?.name || "Company information is not available."}
-          </p>
-        </div>
-
       </section>
     </main>
   );

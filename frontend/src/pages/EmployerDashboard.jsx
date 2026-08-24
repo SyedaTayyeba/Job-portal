@@ -128,20 +128,19 @@ const EmployerDashboard = () => {
                 Post a Job
               </button>
 
-              <button
-                type="button"
-                className="w-full text-left px-4 py-3 rounded-lg bg-slate-50 hover:bg-blue-50 text-sm font-medium text-slate-700 hover:text-blue-600 transition"
-              >
-                View Applications
-              </button>
+           <Link
+  to="/employer-applications"
+  className="block w-full text-left px-4 py-3 rounded-lg bg-slate-50 hover:bg-blue-50 text-sm font-medium text-slate-700 hover:text-blue-600 transition"
+>
+  View Applications
+</Link>
 
-              <button
-                type="button"
-                className="w-full text-left px-4 py-3 rounded-lg bg-slate-50 hover:bg-blue-50 text-sm font-medium text-slate-700 hover:text-blue-600 transition"
-              >
-                Manage Jobs
-              </button>
-
+             <Link
+  to="/employer-jobs"
+  className="block w-full text-left px-4 py-3 rounded-lg bg-slate-50 hover:bg-blue-50 text-sm font-medium text-slate-700 hover:text-blue-600 transition"
+>
+  Manage Jobs
+</Link>
               <Link
                 to="/profile"
                 className="block w-full px-4 py-3 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold text-center transition"
