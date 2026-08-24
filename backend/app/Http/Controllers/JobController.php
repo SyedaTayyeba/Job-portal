@@ -8,64 +8,62 @@ use Illuminate\Http\Request;
 
 class JobController extends Controller
 {
-    public function store(Request $request)
-    {
-        // Get the currently authenticated user
-        $user = auth()->user();
+   public function store(Request $request)
+{
+    // Logged-in employer ko get kar rahe hain
+    $user = auth()->user();
 
-        // Check if the user is authenticated
-        if (! $user) {
-            return response()->json([
-                'message' => 'User not authenticated.',
-            ], 401);
-        }
-
-        // Only employers can create jobs
-        if ($user->role !== 'employer') {
-            return response()->json([
-                'message' => 'Only employers can create jobs.',
-            ], 403);
-        }
-
-        // Validate the job data
-        $request->validate([
-            'company_id' => 'required|exists:companies,id',
-            'title' => 'required|string',
-            'description' => 'required|string',
-            'salary' => 'required|numeric',
-            'location' => 'required|string',
-            'status' => 'required|in:active,closed',
-        ]);
-
-        // Find the company selected by the employer
-        $company = Company::find($request->company_id);
-
-        // Check if the company belongs to the logged-in employer
-        if ($company->user_id !== auth()->id()) {
-            return response()->json([
-                'message' => 'You are not eligible to create a job for this company.',
-            ], 403);
-        }
-
-        // Create the job
-        $job = new Job;
-
-        $job->company_id = $request->company_id;
-        $job->title = $request->title;
-        $job->description = $request->description;
-        $job->salary = $request->salary;
-        $job->location = $request->location;
-        $job->status = $request->status;
-
-        // Save the job
-        $job->save();
-
-        // Return successful response
+    // Check kar rahe hain user login hai ya nahi
+    if (!$user) {
         return response()->json([
-            'message' => 'Job created successfully.',
-            'job' => $job,
-        ], 201);
+            'message' => 'User not authenticated.'
+        ], 401);
     }
+
+    // Sirf employer job create kar sakta hai
+    if ($user->role !== 'employer') {
+        return response()->json([
+            'message' => 'Only employers can create jobs.'
+        ], 403);
+    }
+
+    // Logged-in employer ki company find kar rahe hain
+    $company = Company::where('user_id', $user->id)->first();
+
+    // Agar employer ki company nahi bani hui
+    if (!$company) {
+        return response()->json([
+            'message' => 'Please create your company profile first.'
+        ], 400);
+    }
+
+    // Job data validate kar rahe hain
+    $validated = $request->validate([
+        'title' => 'required|string|max:255',
+        'description' => 'required|string',
+        'salary' => 'required|numeric',
+        'location' => 'nullable|string|max:255',
+        'status' => 'required|in:active,closed',
+    ]);
+
+    // Job create kar rahe hain
+    $job = Job::create([
+        // Company ID automatically logged-in employer ki company se aaegi
+        'company_id' => $company->id,
+
+        'title' => $validated['title'],
+        'description' => $validated['description'],
+        'salary' => $validated['salary'],
+        'location' => $validated['location'],
+        'status' => $validated['status'],
+    ]);
+
+    // Success response
+    return response()->json([
+        'message' => 'Job created successfully.',
+        'job' => $job,
+    ], 201);
+}
 
     public function index()
     {
@@ -157,6 +155,45 @@ class JobController extends Controller
             'job' => $job,
         ]);
     }
+
+public function myJobs()
+{
+    // Logged-in user ko get kar rahe hain
+    $user = auth()->user();
+
+    // Check kar rahe hain user login hai ya nahi
+    if (!$user) {
+        return response()->json([
+            'message' => 'User not authenticated.'
+        ], 401);
+    }
+
+    // Sirf employer apni jobs dekh sakta hai
+    if ($user->role !== 'employer') {
+        return response()->json([
+            'message' => 'Only employers can view their jobs.'
+        ], 403);
+    }
+
+    // Logged-in employer ki company find kar rahe hain
+    $company = Company::where('user_id', $user->id)->first();
+
+    // Agar company nahi hai
+    if (!$company) {
+        return response()->json([
+            'message' => 'Company not found.'
+        ], 404);
+    }
+
+    // Sirf isi employer ki company ki jobs la rahe hain
+    $jobs = Job::with('company')
+        ->where('company_id', $company->id)
+        ->latest()
+        ->get();
+
+    // Jobs return kar rahe hain
+    return response()->json($jobs);
+}
 
    public function destroy(Request $request)
 {

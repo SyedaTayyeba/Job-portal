@@ -15,6 +15,7 @@ class AuthController extends Controller
                 'name' => 'required|string|max:25',
                 'email' => 'required|email|unique:users,email',
                 'password' => 'required|string|min:8',
+                'role' => 'required|in:employer,job_seeker',
             ]
         );
         $user = User::create(
@@ -22,6 +23,7 @@ class AuthController extends Controller
                 'name' => $validated['name'],
                 'email' => $validated['email'],
                 'password' => $validated['password'],
+                'role' => $validated['role'],
             ]
         );
         return response()->json([
