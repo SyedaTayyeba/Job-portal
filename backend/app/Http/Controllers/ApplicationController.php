@@ -73,7 +73,7 @@ class ApplicationController extends Controller
 
         // Jis job par apply kiya ja raha hai uski ID
         $application->job_id = $job->id;
-
+$application->status = 'pending';
         // Application save
         $application->save();
 
@@ -123,12 +123,12 @@ class ApplicationController extends Controller
         }
 
         // Is company ki jobs par aane wali applications
-        $applications = Application::with('job')
-            ->whereHas('job', function ($query) use ($companyId) {
-                $query->where('company_id', $companyId);
-            })
-            ->latest()
-            ->get();
+       $applications = Application::with(['job', 'user'])
+    ->whereHas('job', function ($query) use ($companyId) {
+        $query->where('company_id', $companyId);
+    })
+    ->latest()
+    ->get();
 
         return response()->json($applications);
     }

@@ -11,6 +11,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Laravel\Sanctum\HasApiTokens;
+use App\Models\JobSeekerProfile;
 
 #[Fillable(['name', 'email', 'password','role'])]
 #[Hidden(['password', 'remember_token'])]
@@ -37,4 +38,8 @@ class User extends Authenticatable
     public function applications(){
         return $this->HasMany(Application::class);
     }
+    public function jobSeekerProfile()
+{
+    return $this->hasOne(JobSeekerProfile::class);
+}
 }

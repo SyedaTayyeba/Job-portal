@@ -21,9 +21,17 @@ const EmployerJobs = () => {
   useEffect(() => {
     const fetchJobs = async () => {
       try {
-        const response = await axios.get(
-          "http://localhost:8000/api/jobs"
-        );
+       const token = localStorage.getItem("token");
+
+const response = await axios.get(
+  "http://localhost:8000/api/my-jobs",
+  {
+    headers: {
+      Authorization: `Bearer ${token}`,
+      Accept: "application/json",
+    },
+  }
+);
 
         // Backend se jobs aa gayi
         setJobs(response.data);

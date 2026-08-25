@@ -1,6 +1,34 @@
 import { Link } from "react-router-dom";
-
+import axios from "axios";
+import { Link, useNavigate } from "react-router-dom";
 const JobSeekerDashboard = () => {
+  const navigate = useNavigate();
+
+const handleLogout = async () => {
+  const token = localStorage.getItem("token");
+
+  try {
+    if (token) {
+      await axios.post(
+        "http://localhost:8000/api/logout",
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            Accept: "application/json",
+          },
+        }
+      );
+    }
+  } catch (error) {
+    console.log("Logout Error:", error);
+  } finally {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+
+    navigate("/login");
+  }
+};
   return (
     <main className="min-h-screen bg-slate-100">
       {/* Navbar */}
@@ -15,18 +43,19 @@ const JobSeekerDashboard = () => {
 
           <div className="flex items-center gap-4">
             <Link
-              to="/profile"
+              to="/job-seeker-profile"
               className="text-sm font-medium text-slate-700 hover:text-blue-600 transition"
             >
               Profile
             </Link>
 
-            <button
-              className="text-sm font-medium text-slate-700 hover:text-red-600 transition"
-              type="button"
-            >
-              Logout
-            </button>
+          <button
+  type="button"
+  onClick={handleLogout}
+  className="text-sm font-medium text-slate-700 hover:text-red-600 transition"
+>
+  Logout
+</button>
           </div>
         </div>
       </nav>
@@ -71,13 +100,9 @@ const JobSeekerDashboard = () => {
         {/* Stats */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 mb-8">
           <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm">
-            <p className="text-sm text-slate-500">
-              Applications
-            </p>
+            <p className="text-sm text-slate-500">Applications</p>
 
-            <h2 className="mt-2 text-3xl font-bold text-slate-900">
-              0
-            </h2>
+            <h2 className="mt-2 text-3xl font-bold text-slate-900">0</h2>
 
             <p className="mt-2 text-sm text-slate-500">
               Jobs you've applied to
@@ -85,31 +110,19 @@ const JobSeekerDashboard = () => {
           </div>
 
           <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm">
-            <p className="text-sm text-slate-500">
-              Saved Jobs
-            </p>
+            <p className="text-sm text-slate-500">Saved Jobs</p>
 
-            <h2 className="mt-2 text-3xl font-bold text-slate-900">
-              0
-            </h2>
+            <h2 className="mt-2 text-3xl font-bold text-slate-900">0</h2>
 
-            <p className="mt-2 text-sm text-slate-500">
-              Jobs saved for later
-            </p>
+            <p className="mt-2 text-sm text-slate-500">Jobs saved for later</p>
           </div>
 
           <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm">
-            <p className="text-sm text-slate-500">
-              Profile
-            </p>
+            <p className="text-sm text-slate-500">Profile</p>
 
-            <h2 className="mt-2 text-3xl font-bold text-blue-600">
-              0%
-            </h2>
+            <h2 className="mt-2 text-3xl font-bold text-blue-600">0%</h2>
 
-            <p className="mt-2 text-sm text-slate-500">
-              Complete your profile
-            </p>
+            <p className="mt-2 text-sm text-slate-500">Complete your profile</p>
           </div>
         </div>
 
@@ -118,9 +131,7 @@ const JobSeekerDashboard = () => {
           {/* Latest Jobs */}
           <div className="lg:col-span-2 bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-lg font-bold text-slate-900">
-                Latest Jobs
-              </h2>
+              <h2 className="text-lg font-bold text-slate-900">Latest Jobs</h2>
 
               <button
                 type="button"
@@ -131,9 +142,7 @@ const JobSeekerDashboard = () => {
             </div>
 
             <div className="text-center py-12">
-              <p className="text-slate-500 text-sm">
-                No jobs available yet.
-              </p>
+              <p className="text-slate-500 text-sm">No jobs available yet.</p>
 
               <button
                 type="button"
@@ -160,9 +169,9 @@ const JobSeekerDashboard = () => {
 
              <Link
   to="/my-applications"
-  className="block w-full text-left px-4 py-3 rounded-lg bg-slate-50 hover:bg-blue-50 text-sm font-medium text-slate-700 hover:text-blue-600 transition"
+  className="block px-4 py-3 rounded-lg bg-slate-50 hover:bg-blue-50 text-sm font-medium text-slate-700"
 >
-  View Applications
+  My Applications
 </Link>
               <button
                 type="button"
@@ -172,7 +181,7 @@ const JobSeekerDashboard = () => {
               </button>
 
               <Link
-                to="/profile"
+                to="/job-seeker-profile"
                 className="block w-full px-4 py-3 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold text-center transition"
               >
                 Complete Profile

@@ -8,16 +8,23 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import Jobs from "./pages/Jobs";
 import JobDetails from "./pages/JobDetails";
 import CreateJob from "./pages/CreateJob";
-import ManageJobs from "./pages/ManageJobs";
 import MyApplications from "./pages/MyApplications";
 import EmployerApplications from "./pages/EmployerApplications";
 import EmployerJobs from "./pages/EmployerJobs";
 import EditJob from "./pages/EditJob";
+import CompanyProfile from "./pages/CompanyProfile";
+import JobSeekerApplications from "./pages/JobSeekerApplications";
+import JobSeekerProfile from "./pages/JobSeekerProfile";
+import AdminUsers from "./pages/AdminUsers";
+import AdminJobs from "./pages/AdminJobs";
+import AdminEmployers from "./pages/AdminEmployers";
+
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
+        <Route path="/" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/login" element={<Login />} />
         <Route
@@ -50,7 +57,6 @@ function App() {
     Matlab /jobs/1, /jobs/2, /jobs/3 sab isi page par jayenge. */}
         <Route path="/jobs/:id" element={<JobDetails />} />
         <Route path="/create-job" element={<CreateJob />} />
-        <Route path="/employer-jobs" element={<ManageJobs />} />
         <Route path="/my-applications" element={<MyApplications />} />
         <Route
           path="/employer-applications"
@@ -58,6 +64,39 @@ function App() {
         />
         <Route path="/employer-jobs" element={<EmployerJobs />} />
         <Route path="/edit-job/:id" element={<EditJob />} />
+        <Route path="/company-profile" element={<CompanyProfile />} />
+        <Route
+          path="/job-seeker-applications"
+          element={<JobSeekerApplications />}
+        />
+        <Route path="/job-seeker-profile" element={<JobSeekerProfile />} />
+        <Route
+  path="/admin-users"
+  element={
+    <ProtectedRoute allowedRole="admin">
+      <AdminUsers />
+    </ProtectedRoute>
+  }
+/>
+
+<Route
+  path="/admin-jobs"
+  element={
+    <ProtectedRoute allowedRole="admin">
+      <AdminJobs />
+    </ProtectedRoute>
+  }
+/>
+
+<Route
+  path="/admin-employers"
+  element={
+    <ProtectedRoute allowedRole="admin">
+      <AdminEmployers />
+    </ProtectedRoute>
+  }
+/>
+<Route path="*" element={<div>404 Not Found</div>} />
       </Routes>
     </BrowserRouter>
   );

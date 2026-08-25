@@ -87,7 +87,7 @@ public function store(Request $request)
     }
 
     //
-    public function update(Request $request)
+    public function update(Request $request,$id)
     {
         // Get the currently authenticated user
         $user = auth()->user();
@@ -201,7 +201,7 @@ public function myJobs()
     return response()->json($jobs);
 }
 
-   public function destroy(Request $request)
+   public function destroy($id)
 {
     // 1. Current logged-in user
     $user = auth()->user();
@@ -221,7 +221,7 @@ public function myJobs()
     }
 
     // 4. URL se job ID lena
-    $id = $request->route('id');
+    // $id = $request->route('id');
 
     // 5. Job find karna
     $job = Job::find($id);

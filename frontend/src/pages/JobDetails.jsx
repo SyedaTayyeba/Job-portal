@@ -1,4 +1,4 @@
-import  { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 
@@ -49,22 +49,15 @@ const JobDetails = () => {
   // ==============================
 
   const handleApply = async () => {
-    // LocalStorage se login token lena
     const token = localStorage.getItem("token");
 
-    // Agar token nahi hai to login page par bhej do
     if (!token) {
       alert("Please login first.");
-      navigate("/login");
       return;
     }
 
     try {
-      // Apply button loading
-      setApplying(true);
-
-      // Backend ko application send kar rahe hain
-      const response = await axios.post(
+      await axios.post(
         "http://localhost:8000/api/apply",
         {
           job_id: job.id,
@@ -74,25 +67,16 @@ const JobDetails = () => {
             Authorization: `Bearer ${token}`,
             Accept: "application/json",
           },
-        }
+        },
       );
 
-      // Success message
-      alert(
-        response.data.message || "Application submitted successfully!"
-      );
+      alert("Application submitted successfully.");
     } catch (error) {
       console.log("Apply Error:", error);
 
-      // Backend ka error message show karna
-      const message =
-        error.response?.data?.message ||
-        "Unable to apply for this job.";
-
-      alert(message);
-    } finally {
-      // Button normal
-      setApplying(false);
+      alert(
+        error.response?.data?.message || "Application submit nahi ho saki.",
+      );
     }
   };
 
@@ -103,9 +87,7 @@ const JobDetails = () => {
   if (loading) {
     return (
       <main className="min-h-screen bg-slate-100 flex items-center justify-center">
-        <p className="text-slate-600">
-          Loading job...
-        </p>
+        <p className="text-slate-600">Loading job...</p>
       </main>
     );
   }
@@ -118,9 +100,7 @@ const JobDetails = () => {
     return (
       <main className="min-h-screen bg-slate-100">
         <div className="max-w-3xl mx-auto px-4 py-12 text-center">
-          <h1 className="text-2xl font-bold text-slate-900">
-            Job Not Found
-          </h1>
+          <h1 className="text-2xl font-bold text-slate-900">Job Not Found</h1>
 
           <p className="mt-2 text-slate-500">
             This job does not exist or has been removed.
@@ -139,12 +119,10 @@ const JobDetails = () => {
 
   return (
     <main className="min-h-screen bg-slate-100">
-
       {/* ================= NAVBAR ================= */}
 
       <nav className="bg-white border-b border-slate-200">
         <div className="max-w-7xl mx-auto px-4 md:px-8 py-4 flex items-center justify-between">
-
           <Link
             to="/job-seeker-dashboard"
             className="text-xl font-bold text-blue-600"
@@ -153,7 +131,6 @@ const JobDetails = () => {
           </Link>
 
           <div className="flex items-center gap-4">
-
             <Link
               to="/jobs"
               className="text-sm font-medium text-slate-700 hover:text-blue-600"
@@ -167,7 +144,6 @@ const JobDetails = () => {
             >
               Dashboard
             </Link>
-
           </div>
         </div>
       </nav>
@@ -175,7 +151,6 @@ const JobDetails = () => {
       {/* ================= MAIN ================= */}
 
       <section className="max-w-5xl mx-auto px-4 md:px-8 py-10">
-
         {/* Back button */}
 
         <Link
@@ -188,12 +163,9 @@ const JobDetails = () => {
         {/* Job Card */}
 
         <div className="mt-6 bg-white rounded-2xl border border-slate-200 shadow-sm p-6 md:p-8">
-
           {/* Job title */}
 
-          <h1 className="text-3xl font-bold text-slate-900">
-            {job.title}
-          </h1>
+          <h1 className="text-3xl font-bold text-slate-900">{job.title}</h1>
 
           {/* Company */}
 
@@ -204,11 +176,8 @@ const JobDetails = () => {
           {/* Basic information */}
 
           <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
-
             <div className="bg-slate-50 rounded-xl p-4">
-              <p className="text-xs text-slate-500">
-                Location
-              </p>
+              <p className="text-xs text-slate-500">Location</p>
 
               <p className="mt-1 font-semibold text-slate-800">
                 📍 {job.location || "Not specified"}
@@ -216,9 +185,7 @@ const JobDetails = () => {
             </div>
 
             <div className="bg-slate-50 rounded-xl p-4">
-              <p className="text-xs text-slate-500">
-                Salary
-              </p>
+              <p className="text-xs text-slate-500">Salary</p>
 
               <p className="mt-1 font-semibold text-slate-800">
                 💰 PKR {job.salary}
@@ -226,21 +193,15 @@ const JobDetails = () => {
             </div>
 
             <div className="bg-slate-50 rounded-xl p-4">
-              <p className="text-xs text-slate-500">
-                Status
-              </p>
+              <p className="text-xs text-slate-500">Status</p>
 
-              <p className="mt-1 font-semibold text-green-600">
-                {job.status}
-              </p>
+              <p className="mt-1 font-semibold text-green-600">{job.status}</p>
             </div>
-
           </div>
 
           {/* Description */}
 
           <div className="mt-8">
-
             <h2 className="text-xl font-bold text-slate-900">
               Job Description
             </h2>
@@ -248,28 +209,20 @@ const JobDetails = () => {
             <p className="mt-3 text-slate-600 leading-7 whitespace-pre-line">
               {job.description}
             </p>
-
           </div>
 
           {/* Apply */}
 
           <div className="mt-8 pt-6 border-t border-slate-200">
-
             <button
               type="button"
               onClick={handleApply}
-              disabled={applying || job.status !== "active"}
-              className="w-full md:w-auto px-8 py-3 rounded-lg bg-blue-600 text-white font-semibold hover:bg-blue-700 transition disabled:bg-slate-400 disabled:cursor-not-allowed"
+              disabled={job.status !== "active"}
+              className="px-6 py-3 rounded-lg bg-blue-600 text-white text-sm font-semibold hover:bg-blue-700 disabled:bg-slate-400 disabled:cursor-not-allowed"
             >
-              {applying
-                ? "Applying..."
-                : job.status === "active"
-                ? "Apply Now"
-                : "Job Closed"}
+              {job.status === "active" ? "Apply Now" : "Job Closed"}
             </button>
-
           </div>
-
         </div>
       </section>
     </main>
