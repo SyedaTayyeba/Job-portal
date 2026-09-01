@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import api from "../lib/axios";
 
-const API_URL = VITE_API_URL ;
+const API_URL = import.meta.env.VITE_API_URL;
 
 const JobSeekerProfile = () => {
   const [formData, setFormData] = useState({
