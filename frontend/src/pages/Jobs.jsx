@@ -74,7 +74,7 @@ const Jobs = () => {
 
       // Laravel backend ko application bhejna
       const response = await api.post(
-        "/api/apply",
+        "/apply",
         {
           // Sirf job ki ID backend ko bhejni hai
           job_id: jobId,

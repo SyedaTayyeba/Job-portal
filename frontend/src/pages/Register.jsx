@@ -29,7 +29,7 @@ const Register = () => {
     }
 
     // Send data to backend
-    api.post("/api/register", {
+    api.post("/register", {
         name: formData.name,
         email: formData.email,
         password: formData.password,

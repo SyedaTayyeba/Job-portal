@@ -58,7 +58,7 @@ const JobDetails = () => {
 
     try {
       await api.post(
-        "/api/apply",
+        "/apply",
         {
           job_id: job.id,
         },
