@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import axios from "axios";
+import api from "../lib/axios";
 
 const EmployerApplications = () => {
   const [applications, setApplications] = useState([]);
@@ -26,8 +26,8 @@ const EmployerApplications = () => {
 
       try {
         // Pehle current user ki company nikalenge
-        const companyResponse = await axios.get(
-          "http://localhost:8000/api/companies"
+        const companyResponse = await api.get(
+          "/companies"
         );
 
         const companies = companyResponse.data;
@@ -50,8 +50,8 @@ const EmployerApplications = () => {
         setCompanyId(myCompany.id);
 
         // Company ki applications
-        const applicationsResponse = await axios.get(
-          `http://localhost:8000/api/company/${myCompany.id}/applications`,
+        const applicationsResponse = await api.get(
+          `/company/${myCompany.id}/applications`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -84,8 +84,8 @@ const EmployerApplications = () => {
     const token = localStorage.getItem("token");
 
     try {
-      await axios.put(
-        `http://localhost:8000/api/applications/${applicationId}/status`,
+      await api.put(
+        `/applications/${applicationId}/status`,
         {
           status: status,
         },

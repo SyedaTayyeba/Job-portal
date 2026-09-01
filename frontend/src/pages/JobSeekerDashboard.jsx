@@ -1,4 +1,4 @@
-import axios from "axios";
+import api from "../lib/axios";
 import { Link, useNavigate } from "react-router-dom";
 const JobSeekerDashboard = () => {
   const navigate = useNavigate();
@@ -8,8 +8,8 @@ const handleLogout = async () => {
 
   try {
     if (token) {
-      await axios.post(
-        "http://localhost:8000/api/logout",
+      await api.post(
+        "/logout",
         {},
         {
           headers: {

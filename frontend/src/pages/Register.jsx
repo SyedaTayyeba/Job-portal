@@ -1,4 +1,4 @@
-import axios from "axios";
+import api from "../lib/axios";
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
@@ -29,7 +29,7 @@ const Register = () => {
     }
 
     // Send data to backend
-    axios.post("/api/register", {
+    api.post("/api/register", {
         name: formData.name,
         email: formData.email,
         password: formData.password,

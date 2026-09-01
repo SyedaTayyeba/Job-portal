@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import api from "../lib/axios";
 
 const CreateJob = () => {
   const navigate = useNavigate();
@@ -41,8 +41,8 @@ const CreateJob = () => {
       //
       // company_id hum frontend form se nahi le rahe.
       // Backend logged-in employer ki company verify karega.
-      const response = await axios.post(
-        "http://localhost:8000/api/jobs",
+      const response = await api.post(
+        "/jobs",
         {
           title: formData.title,
           description: formData.description,

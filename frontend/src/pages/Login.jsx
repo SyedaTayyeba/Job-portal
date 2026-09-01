@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import axios from "axios";
+import api from "../lib/axios";
 const Login = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
@@ -36,10 +36,10 @@ font-bold
             e.preventDefault(); //console.log(formData);
             if (formData.email === "" || formData.password === "") {
               alert("Please fill in all fields");
-              return; //alert k bd return na kro to axios phr b reqst send kr deta h hmy empty data ni chahye so islye return kr dia
+              return; //alert k bd return na kro to api phr b reqst send kr deta h hmy empty data ni chahye so islye return kr dia
             }
-            axios
-              .post("http://localhost:8000/api/login", formData)
+            api
+              .post("/login", formData)
               .then((res) => {
                 console.log(res.data);
 

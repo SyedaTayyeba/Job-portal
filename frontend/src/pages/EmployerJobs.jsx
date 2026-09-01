@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import axios from "axios";
+import api from "../lib/axios";
 
 const EmployerJobs = () => {
   // Backend se jobs yahan store hongi
@@ -23,8 +23,8 @@ const EmployerJobs = () => {
       try {
        const token = localStorage.getItem("token");
 
-const response = await axios.get(
-  "http://localhost:8000/api/my-jobs",
+const response = await api.get(
+  "/my-jobs",
   {
     headers: {
       Authorization: `Bearer ${token}`,
@@ -67,8 +67,8 @@ const response = await axios.get(
     const token = localStorage.getItem("token");
 
     try {
-      await axios.delete(
-        `http://localhost:8000/api/jobs/${jobId}`,
+      await api.delete(
+        `/jobs/${jobId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,

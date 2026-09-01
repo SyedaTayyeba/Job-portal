@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import axios from "axios";
+import api from "../lib/axios";
 
 const CompanyProfile = () => {
   const navigate = useNavigate();
@@ -33,8 +33,8 @@ const CompanyProfile = () => {
       }
 
       try {
-        const response = await axios.get(
-          "http://localhost:8000/api/companies"
+        const response = await api.get(
+          "/companies"
         );
 
         const companies = response.data;
@@ -107,8 +107,8 @@ const CompanyProfile = () => {
 
       if (company) {
         // UPDATE
-        response = await axios.put(
-          `http://localhost:8000/api/companies/${company.id}`,
+        response = await api.put(
+          `/companies/${company.id}`,
           formData,
           {
             headers: {
@@ -119,8 +119,8 @@ const CompanyProfile = () => {
         );
       } else {
         // CREATE
-        response = await axios.post(
-          "http://localhost:8000/api/company",
+        response = await api.post(
+          "/company",
           formData,
           {
             headers: {

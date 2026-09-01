@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import axios from "axios";
+import api from "../lib/axios";
 
 const AdminEmployers = () => {
   const [employers, setEmployers] = useState([]);
@@ -21,8 +21,8 @@ const AdminEmployers = () => {
     }
 
     try {
-      const response = await axios.get(
-        "http://localhost:8000/api/admin/employers",
+      const response = await api.get(
+        "/admin/employers",
         {
           headers: {
             Authorization: `Bearer ${token}`,

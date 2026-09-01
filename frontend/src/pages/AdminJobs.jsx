@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import axios from "axios";
+import api from "../lib/axios";
 
 const AdminJobs = () => {
   const [jobs, setJobs] = useState([]);
@@ -21,8 +21,8 @@ const AdminJobs = () => {
     }
 
     try {
-      const response = await axios.get(
-        "http://localhost:8000/api/admin/jobs",
+      const response = await api.get(
+        "/admin/jobs",
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -52,8 +52,8 @@ const AdminJobs = () => {
     }
 
     try {
-      await axios.delete(
-        `http://localhost:8000/api/admin/jobs/${id}`,
+      await api.delete(
+        `/admin/jobs/${id}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,

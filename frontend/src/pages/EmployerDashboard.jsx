@@ -1,6 +1,6 @@
 import { Link ,useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
-import axios from "axios";
+import api from "../lib/axios";
 
 const EmployerDashboard = () => {
   const [jobs, setJobs] = useState([]);
@@ -13,7 +13,7 @@ const EmployerDashboard = () => {
       setLoading(true);
       setError("");
 
-      const response = await axios.get("http://localhost:8000/api/jobs");
+      const response = await api.get("/jobs");
 
       console.log("Jobs from backend:", response.data);
 
@@ -33,8 +33,8 @@ const handleLogout = async () => {
 
   try {
     if (token) {
-      await axios.post(
-        "http://localhost:8000/api/logout",
+      await api.post(
+        "/logout",
         {},
         {
           headers: {
@@ -70,7 +70,7 @@ const handleLogout = async () => {
     try {
       const token = localStorage.getItem("token");
 
-      await axios.delete(`http://localhost:8000/api/jobs/${jobId}`, {
+      await api.delete(`/jobs/${jobId}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import axios from "axios";
+import api from "../lib/axios";
 
 const AdminUsers = () => {
   const navigate = useNavigate();
@@ -29,8 +29,8 @@ const AdminUsers = () => {
     }
 
     try {
-      const response = await axios.get(
-        "http://localhost:8000/api/admin/users",
+      const response = await api.get(
+        "/admin/users",
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -84,8 +84,8 @@ const AdminUsers = () => {
     setSuccess("");
 
     try {
-      const response = await axios.delete(
-        `http://localhost:8000/api/admin/users/${id}`,
+      const response = await api.delete(
+        `/admin/users/${id}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -132,8 +132,8 @@ const AdminUsers = () => {
 
     try {
       if (token) {
-        await axios.post(
-          "http://localhost:8000/api/logout",
+        await api.post(
+          "/logout",
           {},
           {
             headers: {

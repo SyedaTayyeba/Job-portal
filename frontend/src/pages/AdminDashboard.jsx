@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import axios from "axios";
+import api from "../lib/axios";
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
@@ -34,8 +34,8 @@ const AdminDashboard = () => {
     }
 
     try {
-      const response = await axios.get(
-        "http://localhost:8000/api/admin/stats",
+      const response = await api.get(
+        "admin/stats",
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -84,8 +84,8 @@ const AdminDashboard = () => {
 
     try {
       if (token) {
-        await axios.post(
-          "http://localhost:8000/api/logout",
+        await api.post(
+          "logout",
           {},
           {
             headers: {

@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
-import axios from "axios";
+import api from "../lib/axios";
 
 const Jobs = () => {
   // =========================================================
@@ -33,8 +33,8 @@ const Jobs = () => {
   // =========================================================
 
   useEffect(() => {
-    axios
-      .get("http://localhost:8000/api/jobs")
+    api
+      .get("/jobs")
       .then((response) => {
         // Laravel se jobs receive karke state mein save
         setJobs(response.data);
@@ -73,8 +73,8 @@ const Jobs = () => {
       }
 
       // Laravel backend ko application bhejna
-      const response = await axios.post(
-        "http://localhost:8000/api/apply",
+      const response = await api.post(
+        "/api/apply",
         {
           // Sirf job ki ID backend ko bhejni hai
           job_id: jobId,

@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import axios from "axios";
-
+import api from "../lib/axios";
 const MyApplications = () => {
   // Backend se applications yahan store hongi
   const [applications, setApplications] = useState([]);
@@ -30,8 +29,8 @@ const MyApplications = () => {
 
       try {
         // Laravel backend se applications lena
-        const response = await axios.get(
-          "http://localhost:8000/api/applications",
+        const response = await api.get(
+          "/applications",
           {
             headers: {
               Authorization: `Bearer ${token}`,

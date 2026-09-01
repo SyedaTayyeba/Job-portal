@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import axios from "axios";
+import api from "../lib/axios";
 
 const JobDetails = () => {
   // URL se job ID le rahe hain
@@ -27,8 +27,8 @@ const JobDetails = () => {
   // ==============================
 
   useEffect(() => {
-    axios
-      .get(`http://localhost:8000/api/jobs/${id}`)
+    api
+      .get(`/jobs/${id}`)
       .then((response) => {
         // Backend se job receive hui
         setJob(response.data);
@@ -57,8 +57,8 @@ const JobDetails = () => {
     }
 
     try {
-      await axios.post(
-        "http://localhost:8000/api/apply",
+      await api.post(
+        "/api/apply",
         {
           job_id: job.id,
         },

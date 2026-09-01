@@ -1,9 +1,9 @@
 
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import axios from "axios";
+import api from "../lib/axios";
 
-const API_URL = "http://localhost:8000/api";
+const API_URL = VITE_API_URL || "/api";
 
 const JobSeekerProfile = () => {
   const [formData, setFormData] = useState({
@@ -42,7 +42,7 @@ const JobSeekerProfile = () => {
     }
 
     try {
-      const response = await axios.get(
+      const response = await api.get(
         `${API_URL}/job-seeker/profile`,
         {
           headers: {
@@ -161,7 +161,7 @@ const JobSeekerProfile = () => {
         data.append("resume", resume);
       }
 
-      const response = await axios.post(
+      const response = await api.post(
         `${API_URL}/job-seeker/profile`,
         data,
         {

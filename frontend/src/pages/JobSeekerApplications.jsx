@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
-import axios from "axios";
+import api from "../lib/axios";
 
 const JobSeekerApplications = () => {
   const [applications, setApplications] = useState([]);
@@ -18,8 +17,8 @@ const JobSeekerApplications = () => {
       }
 
       try {
-        const response = await axios.get(
-          "http://localhost:8000/api/applications",
+        const response = await api.get(
+          "/applications",
           {
             headers: {
               Authorization: `Bearer ${token}`,

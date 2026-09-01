@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import axios from "axios";
+import api from "../lib/axios";
 
 const EditJob = () => {
   // URL se job ID milegi
@@ -34,8 +34,8 @@ const EditJob = () => {
   useEffect(() => {
     const fetchJob = async () => {
       try {
-        const response = await axios.get(
-          `http://localhost:8000/api/jobs/${id}`
+        const response = await api.get(
+          `/jobs/${id}`
         );
 
         const job = response.data;
@@ -96,8 +96,8 @@ const EditJob = () => {
 
     try {
       // Backend ka PUT route
-      await axios.put(
-        `http://localhost:8000/api/jobs/${id}`,
+      await api.put(
+        `/jobs/${id}`,
         {
           title: formData.title,
           description: formData.description,
